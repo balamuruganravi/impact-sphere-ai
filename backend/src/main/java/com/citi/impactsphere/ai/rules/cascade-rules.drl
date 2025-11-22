@@ -1,0 +1,25 @@
+package com.citi.impactsphere.ai.rules;
+
+import com.citi.impactsphere.ai.model.ImpactNode;
+
+rule "Cascade Rule - Direct Dependency"
+when
+    $a : ImpactNode(riskScore > 0.7)
+    $b : ImpactNode(dependencies contains $a.moduleName)
+then
+    modify($b) {
+        setRiskScore(Math.min(1.0, $a.getRiskScore() + 0.2));
+        setCascadeReason("Module " + $b.getModuleName() + " indirectly depends on " + $a.getModuleName());
+    }
+end
+
+rule "Cascade Rule - Data Coupling"
+when
+    $a : ImpactNode(changedTables not empty)
+    $b : ImpactNode(usesTables intersects $a.changedTables)
+then
+    modify($b) {
+        setRiskScore(1.0);
+        setCascadeReason("Data dependency via shared table: " + $a.getChangedTables());
+    }
+end

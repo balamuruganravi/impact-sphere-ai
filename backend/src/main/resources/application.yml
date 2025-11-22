@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: impact-sphere-ai
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    authentication:
+      username: ${NEO4J_USER:neo4j}
+      password: ${NEO4J_PASSWORD:neo4j}
+  data:
+    neo4j:
+      repositories:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.citi.impactsphere.ai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+vertex:
+  project-id: ${VERTEX_PROJECT_ID:demo-project}
+  location: ${VERTEX_LOCATION:us-central1}
+  model-name: ${VERTEX_MODEL:gemini-pro}
+  credentials: ${VERTEX_CREDENTIALS:/path/to/service-account.json}
+
+drools:
+  rules-path: "classpath:rules/cascade-rules.drl"
+
+tika:
+  tmp-dir: ./tmp
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
