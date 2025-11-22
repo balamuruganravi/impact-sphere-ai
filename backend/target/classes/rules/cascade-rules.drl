@@ -1,0 +1,28 @@
+package com.citi.impactsphere.ai.rules;
+
+import com.citi.impactsphere.ai.model.ImpactNode;
+
+// Sample Drools rules for cascading impact analysis.
+// These rules are placeholders and should be extended to cover additional scenarios.
+
+rule "Cascade Rule - Direct Dependency"
+when
+    $a : ImpactNode( riskScore > 0.7 )
+    $b : ImpactNode( dependencies contains $a.moduleName )
+then
+    modify($b) {
+        setRiskScore( Math.min(1.0, $a.getRiskScore() + 0.2) );
+        setCascadeReason( "Module " + $b.getModuleName() + " indirectly depends on " + $a.getModuleName() );
+    }
+end
+
+rule "Cascade Rule - Data Coupling"
+when
+    $a : ImpactNode( changedTables != null && !changedTables.isEmpty() )
+    $b : ImpactNode( usesTables != null && usesTables.containsAll($a.getChangedTables()) )
+then
+    modify($b) {
+        setRiskScore( 1.0 );
+        setCascadeReason( "Data dependency via shared table: " + $a.getChangedTables() );
+    }
+end
